@@ -9,10 +9,14 @@ target 'Runner' do
   pod 'Firebase/Auth'
   pod 'Firebase/Core'
   pod 'Firebase/Database'
-  # Add any other Firebase or additional pods you need
 
-  # Enable Firebase installation for iOS
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  # If you're using any other Firebase services, add them here:
+  # pod 'Firebase/Storage'
+  # pod 'Firebase/Messaging'
+
+  # Ensure proper configuration for Flutter iOS projects
+  flutter_application_path = File.expand_path('../..')
+  load File.join(flutter_application_path, '.flutter-plugins')
 
   target 'RunnerTests' do
     inherit! :search_paths
