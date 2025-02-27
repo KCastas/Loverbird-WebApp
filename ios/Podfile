@@ -1,25 +1,14 @@
-# Uncomment the next line to define a global platform for your project
+# Define platform
 platform :ios, '12.0'
 
 # Use dynamic frameworks
 use_frameworks!
+use_modular_headers!
+
+# Load Flutter CocoaPods helper script
+flutter_root = File.expand_path('..', File.dirname(__FILE__))
+load File.join(flutter_root, 'ios', 'flutter', 'tools', 'podhelper.rb')
 
 target 'Runner' do
-  # Pods for Runner
-  pod 'Firebase/Auth'
-  pod 'Firebase/Core'
-  pod 'Firebase/Database'
-
-  # If you're using any other Firebase services, add them here:
-  # pod 'Firebase/Storage'
-  # pod 'Firebase/Messaging'
-
-  # Ensure proper configuration for Flutter iOS projects
-  flutter_application_path = File.expand_path('../..')
-  load File.join(flutter_application_path, '.flutter-plugins')
-
-  target 'RunnerTests' do
-    inherit! :search_paths
-    # Pods for testing (if you have any test dependencies)
-  end
+  install_all_flutter_pods(File.dirname(File.realpath(__FILE__)))
 end
