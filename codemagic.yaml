@@ -2,8 +2,6 @@ workflows:
   ios:
     name: iOS build and deploy
     max_build_duration: 60 # Max build time in minutes
-    instances:
-      - macos-latest
     environment:
       vars:
         FLUTTER_CHANNEL: stable
@@ -18,6 +16,3 @@ workflows:
           flutter build ios --release --no-codesign
     artifacts:
       - build/ios/iphoneos/*.ipa # The path to the IPA file (iOS app binary)
-    publish:
-      branches:
-        - main # Only build when changes are pushed to the main branch
