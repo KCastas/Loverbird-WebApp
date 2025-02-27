@@ -1,18 +1,16 @@
 workflows:
   ios:
-    name: iOS build and deploy
-    max_build_duration: 60 # Max build time in minutes
+    name: iOS Build and Publish
+    max_build_duration: 120
     environment:
-      vars:
-        FLUTTER_CHANNEL: stable
-        FLUTTER_VERSION: 3.0.5 # Set the Flutter version you want
+      flutter: stable
+      sdk: ^3.7.0
     scripts:
       - name: Install dependencies
         script: |
           flutter pub get
-          flutter clean
       - name: Build iOS app
         script: |
           flutter build ios --release --no-codesign
     artifacts:
-      - build/ios/iphoneos/*.ipa # The path to the IPA file (iOS app binary)
+      - build/ios/ipa/*.ipa
