@@ -3,7 +3,7 @@ workflows:
     name: iOS Build
     max_build_duration: 60
     scripts:
-      # Step 1: Set up iOS environment and install Flutter dependencies
+      # Step 1: Set up Flutter environment and install dependencies
       - name: Set up Flutter environment
         script: |
           # Ensure Flutter is available and the environment is set up
@@ -13,6 +13,9 @@ workflows:
           # Ensure that the iOS directory exists
           mkdir -p ios
 
+          # Specify the Flutter SDK path
+          flutter_sdk_path="$HOME/flutter"
+
           # Write the Podfile dynamically
           cat > ios/Podfile << EOF
           workspace 'Runner.xcworkspace'
@@ -21,7 +24,9 @@ workflows:
 
           # Correct Flutter application path
           flutter_application_path = '$PWD'
-          load File.join(flutter_application_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+
+          # Load podhelper.rb from Flutter SDK
+          load File.join('$flutter_sdk_path', 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
 
           flutter_install_all_ios_pods(flutter_application_path)
           EOF
