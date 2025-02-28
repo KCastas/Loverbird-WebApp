@@ -1,7 +1,6 @@
 workflows:
-  ios-build:
-    name: iOS Build Workflow
-    max_build_duration: 60
+  ios-workflow:
+    name: iOS Workflow
     environment:
       flutter: stable
       xcode: latest
@@ -9,23 +8,40 @@ workflows:
       - name: Install Flutter dependencies
         script: |
           flutter pub get
-      - name: Generate iOS folder
+
+      - name: Generate iOS Folder and Update Deployment Target
         script: |
+          # Check if iOS folder exists, if not, create it
           if [ ! -d "ios" ]; then
             flutter create .
           fi
-      - name: Clean and reinstall dependencies
-        script: |
-          flutter clean
-          flutter pub get
+
+          # Navigate to the iOS directory
           cd ios
+
+          # Ensure the Podfile exists and update the platform version
+          echo "platform :ios, '13.0'" > Podfile
+          
+          # Add post_install hook to update deployment target for all pods
+          cat <<EOT >> Podfile
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+              end
+            end
+          end
+          EOT
+
+          # Run pod install
           pod install --repo-update
+
+          # Go back to the root directory
           cd ..
-      - name: Precache Flutter iOS engine
-        script: |
-          flutter precache --ios
+
       - name: Build iOS app
         script: |
           flutter build ios --release --no-codesign
+
     artifacts:
       - build/ios/ipa/*.ipa
