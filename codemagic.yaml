@@ -14,6 +14,13 @@ workflows:
           if [ ! -d "ios" ]; then
             flutter create .
           fi
+      - name: Clean and reinstall dependencies
+        script: |
+          flutter clean
+          flutter pub get
+          cd ios
+          pod install --repo-update
+          cd ..
       - name: Precache Flutter iOS engine
         script: |
           flutter precache --ios
