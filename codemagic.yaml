@@ -22,18 +22,10 @@ workflows:
           # Ensure the Podfile exists and update the platform version
           echo "platform :ios, '13.0'" > Podfile
 
-          # Add flutter dependencies and post install hook
-          cat <<EOT >> Podfile
-          flutter_application_path = '../'
-          load File.join(flutter_application_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+          # Add flutter dependencies automatically with Flutter
+          flutter pub get
 
-          target 'Runner' do
-            use_frameworks!
-            flutter_install_all_flutter_pods(flutter_application_path)
-          end
-          EOT
-
-          # Run pod install to install dependencies and create workspace
+          # Run pod install to install dependencies
           pod install --repo-update
 
           # Go back to the root directory
