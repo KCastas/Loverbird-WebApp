@@ -3,8 +3,13 @@ workflows:
     name: iOS Build
     max_build_duration: 60
     scripts:
-      - name: Set up iOS environment
+      # Step 1: Set up iOS environment and install Flutter dependencies
+      - name: Set up Flutter environment
         script: |
+          # Ensure Flutter is available and the environment is set up
+          flutter doctor
+          flutter pub get
+          
           # Ensure that the iOS directory exists
           mkdir -p ios
 
@@ -14,19 +19,20 @@ workflows:
 
           platform :ios, '13.0'
 
-          flutter_application_path = '../'
+          # Correct Flutter application path
+          flutter_application_path = '$PWD'
           load File.join(flutter_application_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
 
           flutter_install_all_ios_pods(flutter_application_path)
           EOF
 
+      # Step 2: Install CocoaPods dependencies
       - name: Install CocoaPods dependencies
         script: |
-          # Install the pods
           cd ios
           pod install
-          
+
+      # Step 3: Build iOS app
       - name: Build iOS app
         script: |
-          # Build the app (adjust as necessary)
           flutter build ios --release --no-codesign
