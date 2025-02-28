@@ -1,39 +1,32 @@
 workflows:
-  ios-workflow:
-    name: iOS Workflow
-    environment:
-      flutter: stable
-      xcode: latest
+  ios:
+    name: iOS Build
+    max_build_duration: 60
     scripts:
-      - name: Install Flutter dependencies
+      - name: Set up iOS environment
         script: |
-          flutter pub get
+          # Ensure that the iOS directory exists
+          mkdir -p ios
 
-      - name: Generate iOS Folder and Update Deployment Target
+          # Write the Podfile dynamically
+          cat > ios/Podfile << EOF
+          workspace 'Runner.xcworkspace'
+
+          platform :ios, '13.0'
+
+          flutter_application_path = '../'
+          load File.join(flutter_application_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+
+          flutter_install_all_ios_pods(flutter_application_path)
+          EOF
+
+      - name: Install CocoaPods dependencies
         script: |
-          # Check if iOS folder exists, if not, create it
-          if [ ! -d "ios" ]; then
-            flutter create .
-          fi
-
-          # Navigate to the iOS directory
+          # Install the pods
           cd ios
-
-          # Ensure the Podfile exists and update the platform version
-          echo "platform :ios, '13.0'" > Podfile
-
-          # Add flutter dependencies automatically with Flutter
-          flutter pub get
-
-          # Run pod install to install dependencies
-          pod install --repo-update
-
-          # Go back to the root directory
-          cd ..
-
+          pod install
+          
       - name: Build iOS app
         script: |
+          # Build the app (adjust as necessary)
           flutter build ios --release --no-codesign
-
-    artifacts:
-      - build/ios/ipa/*.ipa
