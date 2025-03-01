@@ -6,7 +6,6 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import '../models/stroke.dart';
 import '../data/challenges.dart';
@@ -25,16 +24,6 @@ class _DoodleScreenState extends State<DoodleScreen> {
   Color _selectedColor = Colors.black;
   double _brushSize = 4.0;
   GlobalKey _repaintKey = GlobalKey(); // Key for capturing the widget
-  File? _backgroundImage; // Store the selected image
-
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _backgroundImage = File(pickedFile.path);
-      });
-    }
-  }
 
   String _currentChallenge = "Tap the 🎯 button to get a challenge!";
 
@@ -67,45 +56,6 @@ class _DoodleScreenState extends State<DoodleScreen> {
     }
   }
 
-
-  Future<void> _saveDrawing({bool share = false}) async {
-  try {
-    RenderRepaintBoundary? boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-    if (boundary == null) return;
-
-    var image = await boundary.toImage();
-    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
-    Uint8List pngBytes = byteData!.buffer.asUint8List();
-
-    final directory = await getApplicationDocumentsDirectory();
-    String sanitizedChallenge = _currentChallenge.replaceAll(RegExp(r'[^\w\s]+'), '').replaceAll(' ', '_');
-    String challengeFolderPath = '${directory.path}/$sanitizedChallenge';
-
-    // Create folder for challenge if it doesn't exist
-    Directory challengeFolder = Directory(challengeFolderPath);
-    if (!challengeFolder.existsSync()) {
-      challengeFolder.createSync(recursive: true);
-    }
-
-    // Save drawing in challenge folder
-    String filePath = '$challengeFolderPath/doodle_${DateTime.now().millisecondsSinceEpoch}.png';
-    File imgFile = File(filePath);
-    await imgFile.writeAsBytes(pngBytes);
-
-    if (share) {
-      await Share.shareXFiles([XFile(filePath)], text: "I completed the challenge: $_currentChallenge! 🎨");
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Saved to gallery!")),
-      );
-    }
-  } catch (e) {
-    print("Error saving image: $e");
-  }
-}
-
-
-  void _shareDrawing() => _saveDrawing(share: true);
 
   void _startStroke(DragStartDetails details) {
     RenderBox object = context.findRenderObject() as RenderBox;
@@ -167,10 +117,6 @@ class _DoodleScreenState extends State<DoodleScreen> {
               key: _repaintKey,
               child: Stack(
                 children: [
-                  if (_backgroundImage != null) 
-                    Positioned.fill(
-                      child: Image.file(_backgroundImage!, fit: BoxFit.cover),
-                    ),
                   GestureDetector(
                     onPanStart: _startStroke,
                     onPanUpdate: _updateStroke,
@@ -214,16 +160,6 @@ class _DoodleScreenState extends State<DoodleScreen> {
           FloatingActionButton(
             onPressed: _redo,
             child: const Icon(Icons.redo),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: _saveDrawing,
-            child: const Icon(Icons.save),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: _shareDrawing,
-            child: const Icon(Icons.share),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
