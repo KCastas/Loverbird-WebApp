@@ -58,7 +58,17 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=4174020565');
+        navigator.serviceWorker.register('flutter_service_worker.js?v=3015081859');
+      });
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then((reg) => {
+          console.log("Service Worker Registered!", reg);
+        });
       });
     }
   </script>
